@@ -320,6 +320,8 @@ JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyUpdatePositionTest)
 JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyStressTest)
 JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyVsFastMovingTest)
 JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyVertexRadiusTest)
+JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyContactListenerTest)
+JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, SoftBodyCustomUpdateTest)
 
 static TestNameAndRTTI sSoftBodyTests[] =
 {
@@ -333,6 +335,8 @@ static TestNameAndRTTI sSoftBodyTests[] =
 	{ "Soft Body Update Position",		JPH_RTTI(SoftBodyUpdatePositionTest) },
 	{ "Soft Body Stress Test",			JPH_RTTI(SoftBodyStressTest) },
 	{ "Soft Body Vertex Radius Test",	JPH_RTTI(SoftBodyVertexRadiusTest) },
+	{ "Soft Body Contact Listener",		JPH_RTTI(SoftBodyContactListenerTest) },
+	{ "Soft Body Custom Update",		JPH_RTTI(SoftBodyCustomUpdateTest) }
 };
 
 JPH_DECLARE_RTTI_FOR_FACTORY(JPH_NO_EXPORT, BroadPhaseCastRayTest)
@@ -2163,7 +2167,7 @@ bool SamplesApp::UpdateFrame(float inDeltaTime)
 			UpdateDebug(inDeltaTime);
 
 			{
-				// Pocess input, this is done once and before we save the state so that we can save the input state
+				// Process input, this is done once and before we save the state so that we can save the input state
 				JPH_PROFILE("ProcessInput");
 				Test::ProcessInputParams handle_input;
 				handle_input.mDeltaTime = 1.0f / mUpdateFrequency;
