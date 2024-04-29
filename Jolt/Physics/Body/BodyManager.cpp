@@ -412,7 +412,7 @@ Body *BodyManager::RemoveBodyInternal(const BodyID &inBodyID)
 	return body;
 }
 
-#if defined(_DEBUG) && defined(JPH_ENABLE_ASSERTS)
+#if defined(JPH_DEBUG) && defined(JPH_ENABLE_ASSERTS)
 
 void BodyManager::ValidateFreeList() const
 {
@@ -426,7 +426,7 @@ void BodyManager::ValidateFreeList() const
 	JPH_ASSERT(mNumBodies == mBodies.size() - num_freed);
 }
 
-#endif // defined(_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
+#endif // defined(JPH_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
 
 void BodyManager::RemoveBodies(const BodyID *inBodyIDs, int inNumber, Body **outBodies)
 {
@@ -456,9 +456,9 @@ void BodyManager::RemoveBodies(const BodyID *inBodyIDs, int inNumber, Body **out
 		}
 	}
 
-#if defined(_DEBUG) && defined(JPH_ENABLE_ASSERTS)
+#if defined(JPH_DEBUG) && defined(JPH_ENABLE_ASSERTS)
 	ValidateFreeList();
-#endif // defined(_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
+#endif // defined(JPH_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
 }
 
 void BodyManager::DestroyBodies(const BodyID *inBodyIDs, int inNumber)
@@ -482,9 +482,9 @@ void BodyManager::DestroyBodies(const BodyID *inBodyIDs, int inNumber)
 		sDeleteBody(body);
 	}
 
-#if defined(_DEBUG) && defined(JPH_ENABLE_ASSERTS)
+#if defined(JPH_DEBUG) && defined(JPH_ENABLE_ASSERTS)
 	ValidateFreeList();
-#endif // defined(_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
+#endif // defined(JPH_DEBUG) && _defined(JPH_ENABLE_ASSERTS)
 }
 
 void BodyManager::AddBodyToActiveBodies(Body &ioBody)
@@ -1079,14 +1079,23 @@ void BodyManager::Draw(const DrawSettings &inDrawSettings, const PhysicsSettings
 				if (inDrawSettings.mDrawSoftBodyVertices)
 					mp->DrawVertices(inRenderer, com);
 
+				if (inDrawSettings.mDrawSoftBodyVertexVelocities)
+					mp->DrawVertexVelocities(inRenderer, com);
+
 				if (inDrawSettings.mDrawSoftBodyEdgeConstraints)
-					mp->DrawEdgeConstraints(inRenderer, com);
+					mp->DrawEdgeConstraints(inRenderer, com, inDrawSettings.mDrawSoftBodyConstraintColor);
+
+				if (inDrawSettings.mDrawSoftBodyBendConstraints)
+					mp->DrawBendConstraints(inRenderer, com, inDrawSettings.mDrawSoftBodyConstraintColor);
 
 				if (inDrawSettings.mDrawSoftBodyVolumeConstraints)
-					mp->DrawVolumeConstraints(inRenderer, com);
+					mp->DrawVolumeConstraints(inRenderer, com, inDrawSettings.mDrawSoftBodyConstraintColor);
 
 				if (inDrawSettings.mDrawSoftBodySkinConstraints)
-					mp->DrawSkinConstraints(inRenderer);
+					mp->DrawSkinConstraints(inRenderer, com, inDrawSettings.mDrawSoftBodyConstraintColor);
+
+				if (inDrawSettings.mDrawSoftBodyLRAConstraints)
+					mp->DrawLRAConstraints(inRenderer, com, inDrawSettings.mDrawSoftBodyConstraintColor);
 
 				if (inDrawSettings.mDrawSoftBodyPredictedBounds)
 					mp->DrawPredictedBounds(inRenderer, com);
@@ -1121,7 +1130,7 @@ void BodyManager::ValidateContactCacheForAllBodies()
 	mBodiesCacheInvalid.clear();
 }
 
-#ifdef _DEBUG
+#ifdef JPH_DEBUG
 void BodyManager::ValidateActiveBodyBounds()
 {
 	UniqueLock lock(mActiveBodiesMutex JPH_IF_ENABLE_ASSERTS(, this, EPhysicsLockTypes::ActiveBodiesList));
@@ -1135,6 +1144,6 @@ void BodyManager::ValidateActiveBodyBounds()
 			JPH_ASSERT(cached == calculated);
 		}
 }
-#endif // _DEBUG
+#endif // JPH_DEBUG
 
 JPH_NAMESPACE_END

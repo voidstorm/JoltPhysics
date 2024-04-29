@@ -23,6 +23,7 @@ class SoftBodyCreationSettings;
 class TempAllocator;
 #ifdef JPH_DEBUG_RENDERER
 class DebugRenderer;
+enum class ESoftBodyConstraintColor;
 #endif // JPH_DEBUG_RENDERER
 
 /// This class contains the runtime information of a soft body.
@@ -35,10 +36,12 @@ public:
 	using Vertex = SoftBodyVertex;
 	using Edge = SoftBodySharedSettings::Edge;
 	using Face = SoftBodySharedSettings::Face;
+	using DihedralBend = SoftBodySharedSettings::DihedralBend;
 	using Volume = SoftBodySharedSettings::Volume;
 	using InvBind = SoftBodySharedSettings::InvBind;
 	using SkinWeight = SoftBodySharedSettings::SkinWeight;
 	using Skinned = SoftBodySharedSettings::Skinned;
+	using LRA = SoftBodySharedSettings::LRA;
 
 	/// Initialize the soft body motion properties
 	void								Initialize(const SoftBodyCreationSettings &inSettings);
@@ -75,6 +78,14 @@ public:
 	bool								GetUpdatePosition() const					{ return mUpdatePosition; }
 	void								SetUpdatePosition(bool inUpdatePosition)	{ mUpdatePosition = inUpdatePosition; }
 
+	/// Global setting to turn on/off skin constraints
+	bool								GetEnableSkinConstraints() const			{ return mEnableSkinConstraints; }
+	void								SetEnableSkinConstraints(bool inEnableSkinConstraints) { mEnableSkinConstraints = inEnableSkinConstraints; }
+
+	/// Multiplier applied to Skinned::mMaxDistance to allow tightening or loosening of the skin constraints. 0 to hard skin all vertices.
+	float								GetSkinnedMaxDistanceMultiplier() const		{ return mSkinnedMaxDistanceMultiplier; }
+	void								SetSkinnedMaxDistanceMultiplier(float inSkinnedMaxDistanceMultiplier) { mSkinnedMaxDistanceMultiplier = inSkinnedMaxDistanceMultiplier; }
+
 	/// Get local bounding box
 	const AABox &						GetLocalBounds() const						{ return mLocalBounds; }
 
@@ -87,9 +98,12 @@ public:
 #ifdef JPH_DEBUG_RENDERER
 	/// Draw the state of a soft body
 	void								DrawVertices(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform) const;
-	void								DrawEdgeConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform) const;
-	void								DrawVolumeConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform) const;
-	void								DrawSkinConstraints(DebugRenderer *inRenderer) const;
+	void								DrawVertexVelocities(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform) const;
+	void								DrawEdgeConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform, ESoftBodyConstraintColor inConstraintColor) const;
+	void								DrawBendConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform, ESoftBodyConstraintColor inConstraintColor) const;
+	void								DrawVolumeConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform, ESoftBodyConstraintColor inConstraintColor) const;
+	void								DrawSkinConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform, ESoftBodyConstraintColor inConstraintColor) const;
+	void								DrawLRAConstraints(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform, ESoftBodyConstraintColor inConstraintColor) const;
 	void								DrawPredictedBounds(DebugRenderer *inRenderer, RMat44Arg inCenterOfMassTransform) const;
 #endif // JPH_DEBUG_RENDERER
 
@@ -100,12 +114,12 @@ public:
 	void								RestoreState(StateRecorder &inStream);
 
 	/// Skin vertices to supplied joints, information is used by the skinned constraints.
-	/// @param inRootTransform Value of Body::GetCenterOfMassTransform().
-	/// @param inJointMatrices The joint matrices must be expressed relative to inRootTransform.
+	/// @param inCenterOfMassTransform Value of Body::GetCenterOfMassTransform().
+	/// @param inJointMatrices The joint matrices must be expressed relative to inCenterOfMassTransform.
 	/// @param inNumJoints Indicates how large the inJointMatrices array is (used only for validating out of bounds).
 	/// @param inHardSkinAll Can be used to position all vertices on the skinned vertices and can be used to hard reset the soft body.
 	/// @param ioTempAllocator Allocator.
-	void								SkinVertices(RMat44Arg inRootTransform, const Mat44 *inJointMatrices, uint inNumJoints, bool inHardSkinAll, TempAllocator &ioTempAllocator);
+	void								SkinVertices(RMat44Arg inCenterOfMassTransform, const Mat44 *inJointMatrices, uint inNumJoints, bool inHardSkinAll, TempAllocator &ioTempAllocator);
 
 	/// This function allows you to update the soft body immediately without going through the PhysicsSystem.
 	/// This is useful if the soft body is teleported and needs to 'settle' or it can be used if a the soft body
@@ -177,8 +191,9 @@ private:
 	// Information about the state of all skinned vertices
 	struct SkinState
 	{
-		Vec3							mPosition = Vec3::sNaN();
-		Vec3							mNormal = Vec3::sNaN();
+		Vec3							mPreviousPosition = Vec3::sZero();			///< Previous position of the skinned vertex, used to interpolate between the previous and current position
+		Vec3							mPosition = Vec3::sNaN();					///< Current position of the skinned vertex
+		Vec3							mNormal = Vec3::sNaN();						///< Normal of the skinned vertex
 	};
 
 	/// Do a narrow phase check and determine the closest feature that we can collide with
@@ -190,14 +205,20 @@ private:
 	/// Integrate the positions of all vertices by 1 sub step
 	void								IntegratePositions(const SoftBodyUpdateContext &inContext);
 
+	/// Enforce all bend constraints
+	void								ApplyDihedralBendConstraints(const SoftBodyUpdateContext &inContext, uint inStartIndex, uint inEndIndex);
+
 	/// Enforce all volume constraints
-	void								ApplyVolumeConstraints(const SoftBodyUpdateContext &inContext);
+	void								ApplyVolumeConstraints(const SoftBodyUpdateContext &inContext, uint inStartIndex, uint inEndIndex);
 
 	/// Enforce all skin constraints
-	void								ApplySkinConstraints(const SoftBodyUpdateContext &inContext);
+	void								ApplySkinConstraints(const SoftBodyUpdateContext &inContext, uint inStartIndex, uint inEndIndex);
 
 	/// Enforce all edge constraints
 	void								ApplyEdgeConstraints(const SoftBodyUpdateContext &inContext, uint inStartIndex, uint inEndIndex);
+
+	/// Enforce all LRA constraints
+	void								ApplyLRAConstraints(uint inStartIndex, uint inEndIndex);
 
 	/// Enforce all collision constraints & update all velocities according the XPBD algorithm
 	void								ApplyCollisionConstraintsAndUpdateVelocities(const SoftBodyUpdateContext &inContext);
@@ -211,13 +232,23 @@ private:
 	/// Helper function for ParallelUpdate that works on batches of collision planes
 	EStatus								ParallelDetermineCollisionPlanes(SoftBodyUpdateContext &ioContext);
 
-	/// Helper function for ParallelUpdate that works on batches of edges
-	EStatus								ParallelApplyEdgeConstraints(SoftBodyUpdateContext &ioContext, const PhysicsSettings &inPhysicsSettings);
+	/// Helper function for ParallelUpdate that works on batches of constraints
+	EStatus								ParallelApplyConstraints(SoftBodyUpdateContext &ioContext, const PhysicsSettings &inPhysicsSettings);
+
+	/// Helper function to update a single group of constraints
+	void								ProcessGroup(const SoftBodyUpdateContext &ioContext, uint inGroupIndex);
 
 	/// Returns 6 times the volume of the soft body
 	float								GetVolumeTimesSix() const;
 
+#ifdef JPH_DEBUG_RENDERER
+	/// Helper function to draw constraints
+	template <typename GetEndIndex, typename DrawConstraint>
+		inline void						DrawConstraints(ESoftBodyConstraintColor inConstraintColor, const GetEndIndex &inGetEndIndex, const DrawConstraint &inDrawConstraint, ColorArg inBaseColor) const;
+
 	RMat44								mSkinStateTransform = RMat44::sIdentity();	///< The matrix that transforms mSkinState to world space
+#endif // JPH_DEBUG_RENDERER
+
 	RefConst<SoftBodySharedSettings>	mSettings;									///< Configuration of the particles and constraints
 	Array<Vertex>						mVertices;									///< Current state of all vertices in the simulation
 	Array<CollidingShape>				mCollidingShapes;							///< List of colliding shapes retrieved during the last update
@@ -226,8 +257,11 @@ private:
 	AABox								mLocalPredictedBounds;						///< Predicted bounding box for all vertices using extrapolation of velocity by last step delta time
 	uint32								mNumIterations;								///< Number of solver iterations
 	float								mPressure;									///< n * R * T, amount of substance * ideal gas constant * absolute temperature, see https://en.wikipedia.org/wiki/Pressure
+	float								mSkinnedMaxDistanceMultiplier = 1.0f;		///< Multiplier applied to Skinned::mMaxDistance to allow tightening or loosening of the skin constraints
 	bool								mUpdatePosition;							///< Update the position of the body while simulating (set to false for something that is attached to the static world)
 	bool								mHasContact = false;						///< True if the soft body has collided with anything in the last update
+	bool								mEnableSkinConstraints = true;				///< If skin constraints are enabled
+	bool								mSkinStatePreviousPositionValid = false;	///< True if the skinning was updated in the last update so that the previous position of the skin state is valid
 };
 
 JPH_NAMESPACE_END

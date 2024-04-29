@@ -29,6 +29,7 @@ set(UNIT_TESTS_SRC_FILES
 	${UNIT_TESTS_ROOT}/Math/MatrixTests.cpp
 	${UNIT_TESTS_ROOT}/Math/QuatTests.cpp
 	${UNIT_TESTS_ROOT}/Math/UVec4Tests.cpp
+	${UNIT_TESTS_ROOT}/Math/TrigonometryTests.cpp
 	${UNIT_TESTS_ROOT}/Math/Vec3Tests.cpp
 	${UNIT_TESTS_ROOT}/Math/Vec4Tests.cpp
 	${UNIT_TESTS_ROOT}/Math/VectorTests.cpp
@@ -59,6 +60,7 @@ set(UNIT_TESTS_SRC_FILES
 	${UNIT_TESTS_ROOT}/Physics/ShapeTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/SixDOFConstraintTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/SliderConstraintTests.cpp
+	${UNIT_TESTS_ROOT}/Physics/SoftBodyTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/SubShapeIDTest.cpp
 	${UNIT_TESTS_ROOT}/Physics/TransformedShapeTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/WheeledVehicleTests.cpp

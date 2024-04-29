@@ -167,22 +167,30 @@ set(SAMPLES_SRC_FILES
 	${SAMPLES_ROOT}/Tests/Rig/RigPileTest.h
 	${SAMPLES_ROOT}/Tests/Rig/SkeletonMapperTest.cpp
 	${SAMPLES_ROOT}/Tests/Rig/SkeletonMapperTest.h
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyBendConstraintTest.cpp
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyBendConstraintTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyContactListenerTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyContactListenerTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyCustomUpdateTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyCustomUpdateTest.h
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyForceTest.cpp
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyForceTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyFrictionTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyFrictionTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyGravityFactorTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyGravityFactorTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyKinematicTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyKinematicTest.h
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyLRAConstraintTest.cpp
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyLRAConstraintTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyPressureTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyPressureTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyRestitutionTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyRestitutionTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyShapesTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyShapesTest.h
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodySkinnedConstraintTest.cpp
+	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodySkinnedConstraintTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyStressTest.cpp
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyStressTest.h
 	${SAMPLES_ROOT}/Tests/SoftBody/SoftBodyUpdatePositionTest.cpp

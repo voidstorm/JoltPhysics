@@ -7,7 +7,7 @@
 // Jolt library version
 #define JPH_VERSION_MAJOR 5
 #define JPH_VERSION_MINOR 0
-#define JPH_VERSION_PATCH 0
+#define JPH_VERSION_PATCH 1
 
 // Determine which features the library was compiled with
 #ifdef JPH_DOUBLE_PRECISION
@@ -181,14 +181,22 @@
 	#define JPH_CPU_ADDRESS_BITS 32
 	#define JPH_VECTOR_ALIGNMENT 16
 	#define JPH_DVECTOR_ALIGNMENT 32
-	#define JPH_DISABLE_CUSTOM_ALLOCATOR
+	#ifdef __wasm_simd128__
+		#define JPH_USE_SSE
+		#define JPH_USE_SSE4_1
+		#define JPH_USE_SSE4_2
+	#endif
 #elif defined(__e2k__)
-	// Elbrus e2k architecture
+	// E2K CPU architecture (MCST Elbrus 2000)
 	#define JPH_CPU_E2K
 	#define JPH_CPU_ADDRESS_BITS 64
-	#define JPH_USE_SSE
 	#define JPH_VECTOR_ALIGNMENT 16
 	#define JPH_DVECTOR_ALIGNMENT 32
+
+	// Compiler flags on e2k arch determine CPU features
+	#if defined(__SSE__) && !defined(JPH_USE_SSE)
+		#define JPH_USE_SSE
+	#endif
 #else
 	#error Unsupported CPU architecture
 #endif
@@ -303,6 +311,8 @@
 	JPH_GCC_SUPPRESS_WARNING("-Wcomment")														\
 	JPH_GCC_SUPPRESS_WARNING("-Winvalid-offsetof")												\
 	JPH_GCC_SUPPRESS_WARNING("-Wclass-memaccess")												\
+	JPH_GCC_SUPPRESS_WARNING("-Wpedantic")														\
+	JPH_GCC_SUPPRESS_WARNING("-Wunused-parameter")												\
 																								\
 	JPH_MSVC_SUPPRESS_WARNING(4619) /* #pragma warning: there is no warning number 'XXXX' */	\
 	JPH_MSVC_SUPPRESS_WARNING(4514) /* 'X' : unreferenced inline function has been removed */	\
@@ -380,10 +390,10 @@
 	JPH_SUPPRESS_WARNING_POP
 
 // Standard C++ includes
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <float.h>
 #include <limits.h>
 #include <string.h>
-JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <vector>
 #include <utility>
 #include <cmath>
@@ -391,7 +401,6 @@ JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <functional>
 #include <algorithm>
 #include <cstdint>
-JPH_SUPPRESS_WARNINGS_STD_END
 #if defined(JPH_USE_SSE)
 	#include <immintrin.h>
 #elif defined(JPH_USE_NEON)
@@ -402,6 +411,7 @@ JPH_SUPPRESS_WARNINGS_STD_END
 		#include <arm_neon.h>
 	#endif
 #endif
+JPH_SUPPRESS_WARNINGS_STD_END
 
 JPH_NAMESPACE_BEGIN
 
@@ -473,8 +483,13 @@ static_assert(sizeof(void *) == (JPH_CPU_ADDRESS_BITS == 64? 8 : 4), "Invalid si
 // Stack allocation
 #define JPH_STACK_ALLOC(n)		alloca(n)
 
-// Shorthand for #ifdef _DEBUG / #endif
-#ifdef _DEBUG
+// Determine if we want extra debugging code to be active
+#if !defined(NDEBUG) && !defined(JPH_NO_DEBUG)
+	#define JPH_DEBUG
+#endif
+
+// Shorthand for #ifdef JPH_DEBUG / #endif
+#ifdef JPH_DEBUG
 	#define JPH_IF_DEBUG(...)	__VA_ARGS__
 	#define JPH_IF_NOT_DEBUG(...)
 #else
