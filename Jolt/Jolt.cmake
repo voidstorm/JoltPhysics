@@ -14,6 +14,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/AABBTree/NodeCodec/NodeCodecQuadTreeHalfFloat.h
 	${JOLT_PHYSICS_ROOT}/AABBTree/TriangleCodec/TriangleCodecIndexed8BitPackSOA4Flags.h
 	${JOLT_PHYSICS_ROOT}/Core/ARMNeon.h
+	${JOLT_PHYSICS_ROOT}/Core/Array.h
 	${JOLT_PHYSICS_ROOT}/Core/Atomics.h
 	${JOLT_PHYSICS_ROOT}/Core/ByteBuffer.h
 	${JOLT_PHYSICS_ROOT}/Core/Color.cpp
@@ -138,29 +139,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Math/Vec8.h
 	${JOLT_PHYSICS_ROOT}/Math/Vec8.inl
 	${JOLT_PHYSICS_ROOT}/Math/Vector.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/GetPrimitiveTypeOfType.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTypes.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttribute.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeEnum.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeTyped.h
 	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableObject.cpp
 	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableObject.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/AllowedDOFs.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.h
@@ -449,6 +429,33 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/TriangleSplitter/TriangleSplitterMorton.h
 )
 
+if (ENABLE_OBJECT_STREAM)
+	set(JOLT_PHYSICS_SRC_FILES
+		${JOLT_PHYSICS_SRC_FILES}
+		${JOLT_PHYSICS_ROOT}/ObjectStream/GetPrimitiveTypeOfType.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTypes.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttribute.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeEnum.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeTyped.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.h
+	)
+endif()
+
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
 	# Add natvis file
 	set(JOLT_PHYSICS_SRC_FILES ${JOLT_PHYSICS_SRC_FILES} ${JOLT_PHYSICS_ROOT}/Jolt.natvis)
@@ -527,6 +534,10 @@ if (OBJECT_LAYER_BITS)
 	target_compile_definitions(Jolt PUBLIC JPH_OBJECT_LAYER_BITS=${OBJECT_LAYER_BITS})
 endif()
 
+if (USE_STD_VECTOR)
+	target_compile_definitions(Jolt PUBLIC JPH_USE_STD_VECTOR)
+endif()
+
 # Setting to periodically trace broadphase stats to help determine if the broadphase layer configuration is optimal
 if (TRACK_BROADPHASE_STATS)
 	target_compile_definitions(Jolt PUBLIC JPH_TRACK_BROADPHASE_STATS)
@@ -549,6 +560,11 @@ if (PROFILER_IN_DISTRIBUTION)
 	target_compile_definitions(Jolt PUBLIC "JPH_PROFILE_ENABLED")
 elseif (PROFILER_IN_DEBUG_AND_RELEASE)
 	target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Debug,Release,ReleaseASAN,ReleaseUBSAN>:JPH_PROFILE_ENABLED>")
+endif()
+
+# Compile the ObjectStream class and RTTI attribute information
+if (ENABLE_OBJECT_STREAM)
+	target_compile_definitions(Jolt PUBLIC JPH_OBJECT_STREAM)
 endif()
 
 # Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)

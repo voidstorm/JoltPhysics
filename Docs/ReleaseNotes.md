@@ -14,15 +14,27 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Improved sorting of LRA soft body constraints to improve convergence.
 * Added ability to draw soft body constraint evaluation order.
 
+#### HeightField Shape
+
+* Sped up deserialization of HeightFieldShape/MeshShape classes by optimizing reading a vector of data in StreamIn and by switching std::vector out for a custom Array class.
+* Added HeightFieldShape::GetMinHeightValue/GetMaxHeightValue that can be used to know which range of heights are accepted by SetHeights.
+* Allowing negative stride when getting/setting height field shape heights or materials. This improves performance if your data happens to be layed out the wrong way around.
+
+#### Character
+
+* Added CharacterBaseSettings::mEnhancedInternalEdgeRemoval (default false) that allows smoother movement for both the Character and CharacterVirtual class.
+
 #### Various
 
-* Added HeightFieldShape::GetMinHeightValue/GetMaxHeightValue that can be used to know which range of heights are accepted by SetHeights.
 * Added option to get a callback when a JobSystemThreadPool thread starts/stops. This allows you to e.g. set application specific thread locals.
+* Added cmake option USE_ASSERTS to turn on asserts in builds other than the Debug build.
 * Switch from using _DEBUG to NDEBUG to detect debug mode. NDEBUG is defined in the standard while _DEBUG is Visual Studio specific.
+* The OVERRIDE_CXX_FLAGS cmake flag will now also work for MSVC and allow you to specify your own CMAKE_CXX_FLAGS_DEBUG/CMAKE_CXX_FLAGS_RELEASE flags
 
 ### Bug fixes
 
 * Fix for new warning in MSVC 17.10 in immintrin.h: '__check_isa_support': unreferenced inline function has been removed.
+* Fix error in gcc 14. Using always_inline in debug mode causes error: "inlining failed in call to 'always_inline' 'XXX': function not considered for inlining"
 * Fixed clang-18 warning "LLVMgold.so: error loading plugin ... cannot open shared object file: No such file or directory", due to https://github.com/llvm/llvm-project/issues/84271 it currently doesn't support LTO.
 * When calling CharacterVirtual::SetShape, a collision with a sensor would cause the function to abort as if the character was in collision.
 * Fixed bug where the the skinned position of a soft body would update in the first sub-iteration, causing a large velocity spike and jittery behavior.
@@ -32,6 +44,7 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Fixed crash in Ragdoll::DriveToPoseUsingMotors when using constraints other than SwingTwistConstraint.
 * Fixed -Wunused-parameter warning on GCC when building in Release mode with -Wextra.
 * Fixed tolerance in assert in GetPenetrationDepthStepEPA.
+* Due to a difference between the used instructions in NEON and SSE -Vec3::sZero() returned different binary results on ARM vs x86. When JPH_CROSS_PLATFORM_DETERMINISTIC is defined, we ensure that the calculation is the same now.
 
 ## v5.0.0
 

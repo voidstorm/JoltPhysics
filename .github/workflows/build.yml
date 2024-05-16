@@ -78,6 +78,27 @@ jobs:
       working-directory: ${{github.workspace}}/Build/Linux_${{matrix.build_type}}_${{matrix.clang_version}}
       run: ctest --output-on-failure --verbose
 
+  linux-clang-use-std-vector:
+    runs-on: ubuntu-latest
+    name: Linux Clang using std::vector
+    strategy:
+        fail-fast: false
+        matrix:
+            build_type: [Debug, ReleaseASAN]
+            clang_version: [clang++-14]
+            double_precision: [Yes]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/Build/Linux_${{matrix.build_type}}_${{matrix.clang_version}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.clang_version}} -DDOUBLE_PRECISION=${{matrix.double_precision}} -DUSE_STD_VECTOR=ON Build
+    - name: Build
+      run: cmake --build ${{github.workspace}}/Build/Linux_${{matrix.build_type}}_${{matrix.clang_version}} -j 2
+    - name: Test
+      working-directory: ${{github.workspace}}/Build/Linux_${{matrix.build_type}}_${{matrix.clang_version}}
+      run: ctest --output-on-failure --verbose
+
   linux-gcc:
     runs-on: ubuntu-latest
     name: Linux GCC
@@ -162,6 +183,27 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/Build/VS2022_CL -G "Visual Studio 17 2022" -A x64 Build -DDOUBLE_PRECISION=${{matrix.double_precision}}
+    - name: Build
+      run: msbuild Build\VS2022_CL\JoltPhysics.sln /property:Configuration=${{matrix.build_type}} -m
+    - name: Test
+      working-directory: ${{github.workspace}}/Build/VS2022_CL/${{matrix.build_type}}
+      run: ./UnitTests.exe
+
+  msvc_cl_no_object_stream:
+    runs-on: windows-latest
+    name: Visual Studio CL - No Object Stream
+    strategy:
+        fail-fast: false
+        matrix:
+            build_type: [Debug, Distribution]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/Build/VS2022_CL -G "Visual Studio 17 2022" -A x64 Build -DENABLE_OBJECT_STREAM=NO
     - name: Build
       run: msbuild Build\VS2022_CL\JoltPhysics.sln /property:Configuration=${{matrix.build_type}} -m
     - name: Test

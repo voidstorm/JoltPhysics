@@ -3,6 +3,7 @@ set(UNIT_TESTS_ROOT ${PHYSICS_REPO_ROOT}/UnitTests)
 
 # Source files
 set(UNIT_TESTS_SRC_FILES
+	${UNIT_TESTS_ROOT}/Core/ArrayTest.cpp
 	${UNIT_TESTS_ROOT}/Core/FPFlushDenormalsTest.cpp
 	${UNIT_TESTS_ROOT}/Core/InsertionSortTest.cpp
 	${UNIT_TESTS_ROOT}/Core/JobSystemTest.cpp
@@ -33,7 +34,6 @@ set(UNIT_TESTS_SRC_FILES
 	${UNIT_TESTS_ROOT}/Math/Vec3Tests.cpp
 	${UNIT_TESTS_ROOT}/Math/Vec4Tests.cpp
 	${UNIT_TESTS_ROOT}/Math/VectorTests.cpp
-	${UNIT_TESTS_ROOT}/ObjectStream/ObjectStreamTest.cpp
 	${UNIT_TESTS_ROOT}/Physics/ActiveEdgesTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/BroadPhaseTests.cpp
 	${UNIT_TESTS_ROOT}/Physics/CastShapeTests.cpp
@@ -70,6 +70,13 @@ set(UNIT_TESTS_SRC_FILES
 	${UNIT_TESTS_ROOT}/UnitTestFramework.h
 	${UNIT_TESTS_ROOT}/UnitTests.cmake
 )
+
+if (ENABLE_OBJECT_STREAM)
+	set(UNIT_TESTS_SRC_FILES
+		${UNIT_TESTS_SRC_FILES}
+		${UNIT_TESTS_ROOT}/ObjectStream/ObjectStreamTest.cpp
+	)
+endif()
 
 # Group source files
 source_group(TREE ${UNIT_TESTS_ROOT} FILES ${UNIT_TESTS_SRC_FILES})
