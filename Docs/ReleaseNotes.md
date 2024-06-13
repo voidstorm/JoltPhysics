@@ -19,11 +19,11 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Sped up deserialization of HeightFieldShape/MeshShape classes by optimizing reading a vector of data in StreamIn, by switching std::vector out for a custom Array class and by combining a number of allocations into one.
 * Added HeightFieldShape::GetMinHeightValue/GetMaxHeightValue that can be used to know which range of heights are accepted by SetHeights.
 * Allowing negative stride when getting/setting height field shape heights or materials. This improves performance if your data happens to be layed out the wrong way around.
+* Added HeightFieldShapeSettings::mMaterialsCapacity which can enlarge the internal materials array capacity to avoid resizing when HeightFieldShape::SetMaterials is called with materials that weren't in use by the height field yet.
 
 #### Character
 
 * Added CharacterBaseSettings::mEnhancedInternalEdgeRemoval (default false) that allows smoother movement for both the Character and CharacterVirtual class.
-
 
 #### Vehicles
 
@@ -37,6 +37,8 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Added cmake option USE_ASSERTS to turn on asserts in builds other than the Debug build.
 * Switch from using _DEBUG to NDEBUG to detect debug mode. NDEBUG is defined in the standard while _DEBUG is Visual Studio specific.
 * The OVERRIDE_CXX_FLAGS cmake flag will now also work for MSVC and allow you to specify your own CMAKE_CXX_FLAGS_DEBUG/CMAKE_CXX_FLAGS_RELEASE flags
+* BodyInterface::AddForce/Torque functions now take an optional EActivation parameter that makes it optional to activate the body. This can be used e.g. to not let the body wake up if you're applying custom gravity to a body.
+* Activating bodies now resets the sleep timer when the body is already active. This prevents the body from going to sleep in the next frame and can avoid quick 1 frame naps.
 
 ### Bug fixes
 
