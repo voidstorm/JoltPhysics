@@ -19,7 +19,7 @@ constexpr float cDefaultConvexRadius = 0.05f;
 static constexpr float cCapsuleProjectionSlop = 0.02f;
 
 /// Maximum amount of jobs to allow
-constexpr int cMaxPhysicsJobs = 2048;
+constexpr int cMaxPhysicsJobs = 32768;
 
 /// Maximum amount of barriers to allow
 constexpr int cMaxPhysicsBarriers = 8;
@@ -30,7 +30,7 @@ struct PhysicsSettings
 
 	/// Size of body pairs array, corresponds to the maximum amount of potential body pairs that can be in flight at any time.
 	/// Setting this to a low value will use less memory but slow down simulation as threads may run out of narrow phase work.
-	int			mMaxInFlightBodyPairs = 16384;
+	int			mMaxInFlightBodyPairs = 32768;
 
 	/// How many PhysicsStepListeners to notify in 1 batch
 	int			mStepListenersBatchSize = 8;
@@ -47,7 +47,7 @@ struct PhysicsSettings
 	float		mSpeculativeContactDistance = 0.02f;
 
 	/// How much bodies are allowed to sink into each other (unit: meters)
-	float		mPenetrationSlop = 0.02f;
+	float		mPenetrationSlop = 0.01f;
 
 	/// Fraction of its inner radius a body must move per step to enable casting for the LinearCast motion quality
 	float		mLinearCastThreshold = 0.75f;
@@ -84,10 +84,10 @@ struct PhysicsSettings
 	float		mMinVelocityForRestitution = 1.0f;
 
 	/// Time before object is allowed to go to sleep (unit: seconds)
-	float		mTimeBeforeSleep = 0.5f;
+	float		mTimeBeforeSleep = 0.1f;
 
 	/// Velocity of points on bounding box of object below which an object can be considered sleeping (unit: m/s)
-	float		mPointVelocitySleepThreshold = 0.03f;
+	float		mPointVelocitySleepThreshold = 0.175f;
 
 	/// By default the simulation is deterministic, it is possible to turn this off by setting this setting to false. This will make the simulation run faster but it will no longer be deterministic.
 	bool		mDeterministicSimulation = true;
