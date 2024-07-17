@@ -619,9 +619,16 @@ else()
 		# XCode builds for multiple architectures, we can't set global flags
 	elseif (CROSS_COMPILE_ARM OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
 		# ARM64 uses no special commandline flags
+	elseif (EMSCRIPTEN)
+		if (USE_WASM_SIMD)
+			# Jolt currently doesn't implement the WASM specific SIMD intrinsics so uses the SSE 4.2 intrinsics
+			# See: https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
+			# Note that this does not require the browser to actually support SSE 4.2 it merely means that it can translate those instructions to WASM SIMD instructions
+			target_compile_options(Jolt PUBLIC -msimd128 -msse4.2)
+		endif()
 	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "i386")
 		# x86 and x86_64
-  		# On 32-bit builds we need to default to using SSE instructions, the x87 FPU instructions have higher intermediate precision
+		# On 32-bit builds we need to default to using SSE instructions, the x87 FPU instructions have higher intermediate precision
 		# which will cause problems in the collision detection code (the effect is similar to leaving FMA on, search for
 		# JPH_PRECISE_MATH_ON for the locations where this is a problem).
 

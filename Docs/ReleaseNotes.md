@@ -44,6 +44,8 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Added Clone function to MutableCompoundShape. This allows creating a copy before modifying the shape.
 * QuadTree / FixedSizeFreeList: Reorder variable layout to reduce false sharing & thread syncs to reduce simulation time by approximately 5%.
 * Generate a CMake config file when the project is installed. Allows for other projects to import Jolt using the find_package() functionality.
+* Added USE_WASM_SIMD cmake option. This will enable SIMD on the emscripten WASM build.
+* Added Shape::MakeScaleValid function. This function will take a scale vector and check it against the scaling rules for the shape. If it is not valid, it will return a scale that is close to the provided scale which is valid.
 
 ### Bug fixes
 
@@ -64,6 +66,7 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Forgot to free a temporary allocation on an early out in HeightFieldShape::SetMaterials.
 * Fix SSE not being enabled on x86 32-bits.
 * Fixed a bug in the enhanced internal edge removal that could cause rigid bodies and characters to be affected by internal edges.
+* Fixed a bug in MutableCompoundShape::AdjustCenterOfMass which would fail to update the bounding box of the shape.
 
 ## v5.0.0
 
