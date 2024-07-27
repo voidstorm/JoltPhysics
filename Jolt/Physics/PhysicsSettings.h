@@ -25,7 +25,7 @@ constexpr float cDefaultInternalEdgeRemovalVertexToleranceSq = 1.0e-8f;
 constexpr int cMaxPhysicsJobs = 32768;
 
 /// Maximum amount of barriers to allow
-constexpr int cMaxPhysicsBarriers = 8;
+constexpr int cMaxPhysicsBarriers = 1024;
 
 struct PhysicsSettings
 {
