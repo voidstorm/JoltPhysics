@@ -499,7 +499,14 @@ endif()
 target_include_directories(Jolt PUBLIC
 	$<BUILD_INTERFACE:${PHYSICS_REPO_ROOT}>
 	$<INSTALL_INTERFACE:include/>)
-target_precompile_headers(Jolt PRIVATE ${JOLT_PHYSICS_ROOT}/Jolt.h)
+
+# Code coverage doesn't work when using precompiled headers
+target_precompile_headers(Jolt PRIVATE "$<$<NOT:$<CONFIG:ReleaseCoverage>>:${JOLT_PHYSICS_ROOT}/Jolt.h>")
+
+if (NOT CPP_EXCEPTIONS_ENABLED)
+	# Disable use of exceptions in MSVC's STL
+	target_compile_definitions(Jolt PUBLIC $<$<BOOL:${MSVC}>:_HAS_EXCEPTIONS=0>)
+endif()
 
 # Set the debug/non-debug build flags
 target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Debug>:_DEBUG>")
@@ -664,4 +671,15 @@ else()
 
 		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
 	endif()
+endif()
+
+# On Unix flavors we need the pthread library
+if (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows") AND NOT EMSCRIPTEN)
+	target_compile_options(Jolt PUBLIC -pthread)
+endif()
+
+if (EMSCRIPTEN)
+	# We need more than the default 64KB stack and 16MB memory
+	# Also disable warning: running limited binaryen optimizations because DWARF info requested (or indirectly required)
+	target_link_options(Jolt PUBLIC -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=134217728 -Wno-limited-postlink-optimizations)
 endif()
