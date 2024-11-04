@@ -11,6 +11,9 @@ option(DOUBLE_PRECISION "Use double precision math" OFF)
 # When turning this option on, the library will be compiled with debug symbols
 option(GENERATE_DEBUG_SYMBOLS "Generate debug symbols" ON)
 
+# Which type of debug symbols to generate, e.g. using source-map when compiling with emscripten makes compilation a lot faster
+set(JPH_DEBUG_SYMBOL_FORMAT "" CACHE STRING "Which type of debug symbols to generate")
+
 # When turning this option on, the library will override the default CMAKE_CXX_FLAGS_DEBUG/RELEASE values, otherwise they will use the platform defaults
 option(OVERRIDE_CXX_FLAGS "Override CMAKE_CXX_FLAGS_DEBUG/RELEASE" ON)
 
@@ -191,7 +194,7 @@ else()
 
 	# Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g${JPH_DEBUG_SYMBOL_FORMAT}")
 	endif()
 
 	if (NOT CPP_RTTI_ENABLED)
@@ -293,7 +296,8 @@ if (ENABLE_INSTALL)
 		string(REPLACE ${PHYSICS_REPO_ROOT} "" RELATIVE_SRC_FILE ${SRC_FILE})
 		get_filename_component(DESTINATION_PATH ${RELATIVE_SRC_FILE} DIRECTORY)
 		if (NOT RELATIVE_SRC_FILE MATCHES "\.cpp")
-			install(FILES ${SRC_FILE} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${DESTINATION_PATH})
+			cmake_path(SET DST_FILE NORMALIZE "${CMAKE_INSTALL_INCLUDEDIR}/${DESTINATION_PATH}")
+			install(FILES ${SRC_FILE} DESTINATION ${DST_FILE})
 		endif()
 	endforeach()
 
