@@ -15,7 +15,7 @@ namespace ScaleHelpers
 	static constexpr float	cMinScale = 1.0e-6f;
 
 	/// The tolerance used to check if components of the scale vector are the same
-	static constexpr float	cScaleToleranceSq = 1.0e-8f;
+	static constexpr float	cScaleToleranceSq = 1.0e-3f;
 
 	/// Test if a scale is identity
 	inline bool				IsNotScaled(Vec3Arg inScale)									{ return inScale.IsClose(Vec3::sReplicate(1.0f), cScaleToleranceSq); }
