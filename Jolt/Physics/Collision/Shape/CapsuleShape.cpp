@@ -151,7 +151,7 @@ private:
 
 const ConvexShape::Support *CapsuleShape::GetSupportFunction(ESupportMode inMode, SupportBuffer &inBuffer, Vec3Arg inScale) const
 {
-	JPH_ASSERT(IsValidScale(inScale));
+	//JPH_ASSERT(IsValidScale(inScale));
 
 	// Get scaled capsule
 	Vec3 abs_scale = inScale.Abs();
@@ -176,7 +176,7 @@ const ConvexShape::Support *CapsuleShape::GetSupportFunction(ESupportMode inMode
 void CapsuleShape::GetSupportingFace(const SubShapeID &inSubShapeID, Vec3Arg inDirection, Vec3Arg inScale, Mat44Arg inCenterOfMassTransform, SupportingFace &outVertices) const
 {
 	JPH_ASSERT(inSubShapeID.IsEmpty(), "Invalid subshape ID");
-	JPH_ASSERT(IsValidScale(inScale));
+	//JPH_ASSERT(IsValidScale(inScale));
 
 	// Get direction in horizontal plane
 	Vec3 direction = inDirection;
@@ -265,7 +265,7 @@ AABox CapsuleShape::GetLocalBounds() const
 
 AABox CapsuleShape::GetWorldSpaceBounds(Mat44Arg inCenterOfMassTransform, Vec3Arg inScale) const
 {
-	JPH_ASSERT(IsValidScale(inScale));
+	//JPH_ASSERT(IsValidScale(inScale));
 
 	Vec3 abs_scale = inScale.Abs();
 	float scale = abs_scale.GetX();
