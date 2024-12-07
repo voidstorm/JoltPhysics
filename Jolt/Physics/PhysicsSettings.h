@@ -80,7 +80,9 @@ struct PhysicsSettings
 	/// Number of solver position iterations to run
 	uint		mNumPositionSteps = 2;
 
-	/// Minimal velocity needed before a collision can be elastic (unit: m)
+	/// Minimal velocity needed before a collision can be elastic. If the relative velocity between colliding objects
+	/// in the direction of the contact normal is lower than this, the restitution will be zero regardless of the configured
+	/// value. This lets an object settle sooner. Must be a positive number. (unit: m)
 	float		mMinVelocityForRestitution = 1.0f;
 
 	/// Time before object is allowed to go to sleep (unit: seconds)
@@ -88,6 +90,11 @@ struct PhysicsSettings
 
 	/// Velocity of points on bounding box of object below which an object can be considered sleeping (unit: m/s)
 	float		mPointVelocitySleepThreshold = 0.175f;
+	/// To detect if an object is sleeping, we use 3 points:
+	/// - The center of mass.
+	/// - The centers of the faces of the bounding box that are furthest away from the center.
+	/// The movement of these points is tracked and if the velocity of all 3 points is lower than this value,
+	/// the object is allowed to go to sleep. Must be a positive number. (unit: m/s)
 
 	/// By default the simulation is deterministic, it is possible to turn this off by setting this setting to false. This will make the simulation run faster but it will no longer be deterministic.
 	bool		mDeterministicSimulation = true;
