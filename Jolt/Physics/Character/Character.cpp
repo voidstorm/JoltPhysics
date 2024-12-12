@@ -49,7 +49,10 @@ Character::Character(const CharacterSettings *inSettings, RVec3Arg inPosition, Q
 Character::~Character()
 {
 	// Destroy the body
-	mSystem->GetBodyInterface().DestroyBody(mBodyID);
+	//if(mSystem->GetBodyInterface().IsAdded(mBodyID)) {
+	//	mSystem->GetBodyInterface().RemoveBody(mBodyID);
+	//}
+	//mSystem->GetBodyInterface().DestroyBody(mBodyID);
 }
 
 void Character::AddToPhysicsSystem(EActivation inActivationMode, bool inLockBodies)
