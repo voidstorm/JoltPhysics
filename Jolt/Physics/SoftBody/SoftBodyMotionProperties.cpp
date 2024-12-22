@@ -315,7 +315,7 @@ void SoftBodyMotionProperties::IntegratePositions(const SoftBodyUpdateContext &i
 
 	// Integrate
 	Vec3 sub_step_gravity = inContext.mGravity * dt;
-	Vec3 sub_step_impulse = GetAccumulatedForce() * dt;
+	Vec3 sub_step_impulse = GetAccumulatedForce() * dt / max(float(mVertices.size()), 1.0f);
 	for (Vertex &v : mVertices)
 		if (v.mInvMass > 0.0f)
 		{
@@ -599,7 +599,7 @@ void SoftBodyMotionProperties::ApplyCollisionConstraintsAndUpdateVelocities(cons
 	JPH_PROFILE_FUNCTION();
 
 	float dt = inContext.mSubStepDeltaTime;
-	float restitution_treshold = -2.0f * inContext.mGravity.Length() * dt;
+	float restitution_threshold = -2.0f * inContext.mGravity.Length() * dt;
 	float vertex_radius = mSettings->mVertexRadius;
 	for (Vertex &v : mVertices)
 		if (v.mInvMass > 0.0f)
@@ -674,7 +674,7 @@ void SoftBodyMotionProperties::ApplyCollisionConstraintsAndUpdateVelocities(cons
 							// Calculate delta relative velocity due to restitution (equation 35)
 							dv += v_normal;
 							float prev_v_normal = (prev_v - v2).Dot(contact_normal);
-							if (prev_v_normal < restitution_treshold)
+							if (prev_v_normal < restitution_threshold)
 								dv += cs.mRestitution * prev_v_normal * contact_normal;
 
 							// Calculate impulse
@@ -707,7 +707,7 @@ void SoftBodyMotionProperties::ApplyCollisionConstraintsAndUpdateVelocities(cons
 						// Apply restitution (equation 35)
 						v.mVelocity -= v_normal;
 						float prev_v_normal = prev_v.Dot(contact_normal);
-						if (prev_v_normal < restitution_treshold)
+						if (prev_v_normal < restitution_threshold)
 							v.mVelocity -= cs.mRestitution * prev_v_normal * contact_normal;
 					}
 				}
@@ -765,7 +765,7 @@ void SoftBodyMotionProperties::UpdateSoftBodyState(SoftBodyUpdateContext &ioCont
 
 	// Calculate linear/angular velocity of the body by averaging all vertices and bringing the value to world space
 	float num_vertices_divider = float(max(int(mVertices.size()), 1));
-	SetLinearVelocity(ioContext.mCenterOfMassTransform.Multiply3x3(linear_velocity / num_vertices_divider));
+	SetLinearVelocityClamped(ioContext.mCenterOfMassTransform.Multiply3x3(linear_velocity / num_vertices_divider));
 	SetAngularVelocity(ioContext.mCenterOfMassTransform.Multiply3x3(angular_velocity / num_vertices_divider));
 
 	if (mUpdatePosition)
@@ -1032,7 +1032,10 @@ void SoftBodyMotionProperties::SkinVertices([[maybe_unused]] RMat44Arg inCenterO
 	const Mat44 *skin_matrices_end = skin_matrices + num_skin_matrices;
 	const InvBind *inv_bind_matrix = mSettings->mInvBindMatrices.data();
 	for (Mat44 *s = skin_matrices; s < skin_matrices_end; ++s, ++inv_bind_matrix)
+	{
+		JPH_ASSERT(inv_bind_matrix->mJointIndex < inNumJoints);
 		*s = inJointMatrices[inv_bind_matrix->mJointIndex] * inv_bind_matrix->mInvBind;
+	}
 
 	// Skin the vertices
 	JPH_IF_DEBUG_RENDERER(mSkinStateTransform = inCenterOfMassTransform;)

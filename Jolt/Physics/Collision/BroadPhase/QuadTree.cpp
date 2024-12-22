@@ -110,7 +110,6 @@ bool QuadTree::Node::EncapsulateChildBounds(int inChildIndex, const AABox &inBou
 // QuadTree
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const float QuadTree::cLargeFloat = 1.0e30f;
 const AABox QuadTree::cInvalidBounds(Vec3::sReplicate(cLargeFloat), Vec3::sReplicate(-cLargeFloat));
 
 void QuadTree::GetBodyLocation(const TrackingVector &inTracking, BodyID inBodyID, uint32 &outNodeIdx, uint32 &outChildIdx) const
@@ -702,7 +701,7 @@ void QuadTree::WidenAndMarkNodeAndParentsChanged(uint32 inNodeIndex, const AABox
 
 bool QuadTree::TryInsertLeaf(TrackingVector &ioTracking, int inNodeIndex, NodeID inLeafID, const AABox &inLeafBounds, int inLeafNumBodies)
 {
-	// Tentively assign the node as parent
+	// Tentatively assign the node as parent
 	bool leaf_is_node = inLeafID.IsNode();
 	if (leaf_is_node)
 	{
