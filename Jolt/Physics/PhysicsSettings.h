@@ -86,7 +86,7 @@ struct PhysicsSettings
 	float		mMinVelocityForRestitution = 1.0f;
 
 	/// Time before object is allowed to go to sleep (unit: seconds)
-	float		mTimeBeforeSleep = 0.1f;
+	float		mTimeBeforeSleep = 0.5f;
 
 	/// Velocity of points on bounding box of object below which an object can be considered sleeping (unit: m/s)
 	float		mPointVelocitySleepThreshold = 0.175f;
