@@ -92,7 +92,7 @@ struct PhysicsSettings
 	float		mMinVelocityForRestitution = 1.0f;
 
 	/// Time before object is allowed to go to sleep (unit: seconds)
-	float		mTimeBeforeSleep = 0.1f;
+	float		mTimeBeforeSleep = 0.5f;
 
 	/// To detect if an object is sleeping, we use 3 points:
 	/// - The center of mass.
