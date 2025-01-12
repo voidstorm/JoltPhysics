@@ -39,7 +39,7 @@ struct PhysicsSettings
 	int			mStepListenerBatchesPerJob = 1;
 
 	/// Baumgarte stabilization factor (how much of the position error to 'fix' in 1 update) (unit: dimensionless, 0 = nothing, 1 = 100%)
-	float		mBaumgarte = 0.2f;
+	float		mBaumgarte = 0.25f;
 
 	/// Radius around objects inside which speculative contact points will be detected. Note that if this is too big
 	/// you will get ghost collisions as speculative contacts are based on the closest points during the collision detection
@@ -75,10 +75,10 @@ struct PhysicsSettings
 
 	/// Number of solver velocity iterations to run
 	/// Note that this needs to be >= 2 in order for friction to work (friction is applied using the non-penetration impulse from the previous iteration)
-	uint		mNumVelocitySteps = 12;
+	uint		mNumVelocitySteps = 15;
 
 	/// Number of solver position iterations to run
-	uint		mNumPositionSteps = 3;
+	uint		mNumPositionSteps = 4;
 
 	/// Minimal velocity needed before a collision can be elastic. If the relative velocity between colliding objects
 	/// in the direction of the contact normal is lower than this, the restitution will be zero regardless of the configured
@@ -89,7 +89,7 @@ struct PhysicsSettings
 	float		mTimeBeforeSleep = 0.5f;
 
 	/// Velocity of points on bounding box of object below which an object can be considered sleeping (unit: m/s)
-	float		mPointVelocitySleepThreshold = 0.175f;
+	float		mPointVelocitySleepThreshold = 0.18f;
 	/// To detect if an object is sleeping, we use 3 points:
 	/// - The center of mass.
 	/// - The centers of the faces of the bounding box that are furthest away from the center.
