@@ -47,7 +47,7 @@ struct PhysicsSettings
 	float		mSpeculativeContactDistance = 0.02f;
 
 	/// How much bodies are allowed to sink into each other (unit: meters)
-	float		mPenetrationSlop = 0.01f;
+	float		mPenetrationSlop = 0.025f;
 
 	/// Fraction of its inner radius a body must move per step to enable casting for the LinearCast motion quality
 	float		mLinearCastThreshold = 0.75f;
@@ -75,10 +75,10 @@ struct PhysicsSettings
 
 	/// Number of solver velocity iterations to run
 	/// Note that this needs to be >= 2 in order for friction to work (friction is applied using the non-penetration impulse from the previous iteration)
-	uint		mNumVelocitySteps = 10;
+	uint		mNumVelocitySteps = 12;
 
 	/// Number of solver position iterations to run
-	uint		mNumPositionSteps = 2;
+	uint		mNumPositionSteps = 3;
 
 	/// Minimal velocity needed before a collision can be elastic. If the relative velocity between colliding objects
 	/// in the direction of the contact normal is lower than this, the restitution will be zero regardless of the configured
