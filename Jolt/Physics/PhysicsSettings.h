@@ -89,7 +89,7 @@ struct PhysicsSettings
 	float		mTimeBeforeSleep = 0.5f;
 
 	/// Velocity of points on bounding box of object below which an object can be considered sleeping (unit: m/s)
-	float		mPointVelocitySleepThreshold = 0.25f;
+	float		mPointVelocitySleepThreshold = 0.18f;
 	/// To detect if an object is sleeping, we use 3 points:
 	/// - The center of mass.
 	/// - The centers of the faces of the bounding box that are furthest away from the center.
