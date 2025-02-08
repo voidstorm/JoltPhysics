@@ -75,10 +75,10 @@ struct PhysicsSettings
 
 	/// Number of solver velocity iterations to run
 	/// Note that this needs to be >= 2 in order for friction to work (friction is applied using the non-penetration impulse from the previous iteration)
-	uint		mNumVelocitySteps = 15;
+	uint		mNumVelocitySteps = 10;
 
 	/// Number of solver position iterations to run
-	uint		mNumPositionSteps = 4;
+	uint		mNumPositionSteps = 2;
 
 	/// Minimal velocity needed before a collision can be elastic. If the relative velocity between colliding objects
 	/// in the direction of the contact normal is lower than this, the restitution will be zero regardless of the configured
