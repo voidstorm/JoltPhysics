@@ -68,7 +68,7 @@ private:
 		virtual void		OnJobFinished(Job *inJob) override;
 
 		/// Jobs queue for the barrier
-		static constexpr uint cMaxJobs = 2048;
+		static constexpr uint cMaxJobs = 16384;
 		static_assert(IsPowerOf2(cMaxJobs));								// We do bit operations and require max jobs to be a power of 2
 		atomic<Job *>		mJobs[cMaxJobs];								///< List of jobs that are part of this barrier, nullptrs for empty slots
 		alignas(JPH_CACHE_LINE_SIZE) atomic<uint> mJobReadIndex { 0 };		///< First job that could be valid (modulo cMaxJobs), can be nullptr if other thread is still working on adding the job
