@@ -22,7 +22,7 @@ static constexpr float cCapsuleProjectionSlop = 0.02f;
 constexpr int cMaxPhysicsJobs = 32768;
 
 /// Maximum amount of barriers to allow
-constexpr int cMaxPhysicsBarriers = 4096;
+constexpr int cMaxPhysicsBarriers = 8096;
 
 struct PhysicsSettings
 {
@@ -36,7 +36,7 @@ struct PhysicsSettings
 	int			mStepListenersBatchSize = 8;
 
 	/// How many step listener batches are needed before spawning another job (set to INT_MAX if no parallelism is desired)
-	int			mStepListenerBatchesPerJob = 1;
+	int			mStepListenerBatchesPerJob = 32;
 
 	/// Baumgarte stabilization factor (how much of the position error to 'fix' in 1 update) (unit: dimensionless, 0 = nothing, 1 = 100%)
 	float		mBaumgarte = 0.5f;
@@ -75,10 +75,10 @@ struct PhysicsSettings
 
 	/// Number of solver velocity iterations to run
 	/// Note that this needs to be >= 2 in order for friction to work (friction is applied using the non-penetration impulse from the previous iteration)
-	uint		mNumVelocitySteps = 15;
+	uint		mNumVelocitySteps = 32;
 
 	/// Number of solver position iterations to run
-	uint		mNumPositionSteps = 4;
+	uint		mNumPositionSteps = 16;
 
 	/// Minimal velocity needed before a collision can be elastic. If the relative velocity between colliding objects
 	/// in the direction of the contact normal is lower than this, the restitution will be zero regardless of the configured

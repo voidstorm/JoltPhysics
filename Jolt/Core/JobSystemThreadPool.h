@@ -83,7 +83,7 @@ private:
 	Array<thread>			mThreads;
 
 	// The job queue
-	static constexpr uint32 cQueueLength = 8192;
+	static constexpr uint32 cQueueLength = 16384;
 	static_assert(IsPowerOf2(cQueueLength));								// We do bit operations and require queue length to be a power of 2
 	atomic<Job *>			mQueue[cQueueLength];
 
