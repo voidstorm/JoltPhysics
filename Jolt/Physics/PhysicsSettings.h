@@ -22,7 +22,7 @@ static constexpr float cCapsuleProjectionSlop = 0.02f;
 constexpr int cMaxPhysicsJobs = 32768;
 
 /// Maximum amount of barriers to allow
-constexpr int cMaxPhysicsBarriers = 2048;
+constexpr int cMaxPhysicsBarriers = 4096;
 
 struct PhysicsSettings
 {
@@ -39,7 +39,7 @@ struct PhysicsSettings
 	int			mStepListenerBatchesPerJob = 1;
 
 	/// Baumgarte stabilization factor (how much of the position error to 'fix' in 1 update) (unit: dimensionless, 0 = nothing, 1 = 100%)
-	float		mBaumgarte = 0.25f;
+	float		mBaumgarte = 0.5f;
 
 	/// Radius around objects inside which speculative contact points will be detected. Note that if this is too big
 	/// you will get ghost collisions as speculative contacts are based on the closest points during the collision detection
@@ -50,7 +50,7 @@ struct PhysicsSettings
 	float		mPenetrationSlop = 0.025f;
 
 	/// Fraction of its inner radius a body must move per step to enable casting for the LinearCast motion quality
-	float		mLinearCastThreshold = 0.75f;
+	float		mLinearCastThreshold = 0.15f;
 
 	/// Fraction of its inner radius a body may penetrate another body for the LinearCast motion quality
 	float		mLinearCastMaxPenetration = 0.25f;
