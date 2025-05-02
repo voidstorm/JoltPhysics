@@ -47,7 +47,7 @@ struct PhysicsSettings
 	float		mSpeculativeContactDistance = 0.02f;
 
 	/// How much bodies are allowed to sink into each other (unit: meters)
-	float		mPenetrationSlop = 0.015f;
+	float		mPenetrationSlop = 0.01f;
 
 	/// Fraction of its inner radius a body must move per step to enable casting for the LinearCast motion quality
 	float		mLinearCastThreshold = 0.15f;
