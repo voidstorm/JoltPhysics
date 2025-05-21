@@ -2,6 +2,25 @@
 
 For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/APIChanges.md).
 
+## Unreleased Changes
+
+### New functionality
+
+* Added Cosserat rods to soft bodies. This is a stick constraint with an orientation that can be used to attach geometry. Can be used e.g. to simulate vegetation in a cheap way. See the new `SoftBodyCosseratRodConstraintTest` demo.
+* Added ability to drive hinge constraints with `Ragdoll::DriveToPoseUsingMotors`. This also adds `HingeConstraint::SetTargetOrientationBS` which sets the target angle in body space.
+* Added `JPH_USE_EXTERNAL_PROFILE` cmake option that allows overriding the behavior of the profile macros.
+
+### Bug Fixes
+
+* The remap tables in `SoftBodySharedSettings::OptimizationResults`` mapped from new to old index instead of from old to new as was documented. The maps now behave as documented.
+* Fixed an issue where soft body bend constraints could be created with identical vertices. This led to an assert triggering.
+* Fixed infinite recursion when colliding a `TriangleShape` vs a `TriangleShape`.
+* 32-bit MinGW g++ doesn't call the correct overload for the new operator when a type is 16 bytes aligned. This could cause unaligned read access violations.
+* Fixed compiling in double precision and fixed issues with floating point contraction that caused unit test failures on LoongArch architecture.
+* Added an epsilon to the `CastRay` / `CastShape` early out condition to avoid dividing by a very small number and overflowing to INF. This can cause a float overflow exception.
+* Fixed Samples requiring Vulkan extension `VK_EXT_device_address_binding_report` without checking if it is available.
+* Fixed Vulkan warning in Samples: VkSemaphore is being signaled by VkQueue but it may still be in use by VkSwapchainKHR.
+
 ## v5.3.0
 
 ### New functionality

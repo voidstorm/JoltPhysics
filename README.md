@@ -78,6 +78,7 @@ Why create yet another physics engine? Firstly, it has been a personal learning 
 * Soft body simulation (e.g. a soft ball or piece of cloth).
 	* Edge constraints.
 	* Dihedral bend constraints.
+	* Cosserat rod constraints (an edge with an orientation that can be used to orient geometry, e.g. a plant leaf).
 	* Tetrahedron volume constraints.
 	* Long range attachment constraints (also called tethers).
 	* Limiting the simulation to stay within a certain range of a skinned vertex.
@@ -147,7 +148,7 @@ If you're interested in how Jolt scales with multiple CPUs and compares to other
 
 * C [here](https://github.com/amerkoleci/joltc), [here](https://github.com/zig-gamedev/zphysics/tree/main/libs/JoltC) and [here](https://github.com/SecondHalfGames/JoltC/)
 * [C#](https://github.com/amerkoleci/JoltPhysicsSharp)
-* [Java](https://github.com/stephengold/jolt-jni)
+* [Java or Kotlin](https://stephengold.github.io/jolt-jni-docs)
 * [JavaScript](https://github.com/jrouwe/JoltPhysics.js)
 * [Rust](https://github.com/SecondHalfGames/jolt-rust)
 * [Zig](https://github.com/zig-gamedev/zphysics)
