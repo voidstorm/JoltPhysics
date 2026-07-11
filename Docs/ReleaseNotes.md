@@ -2,7 +2,7 @@
 
 For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/APIChanges.md).
 
-## Unreleased changes
+## v5.6.0
 
 ### New functionality
 
@@ -25,7 +25,7 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Added `Ragdoll::DriveToPoseUsingMotors` variant that drives to a pose using both position and velocity.
 * Added `Body::ApplyBodyCreationSettings` and `Body::ApplySoftBodyCreationSettings` to be able to update a body with creation settings after creation.
 * Added `ShapeCastSettings::mExtraConvexRadius` which inflates the query shape by an extra convex radius.
-* Various performance and memory optimizations.
+* Up to 40% performance improvement (scene dependent) and up to 70% memory reduction (scene dependent).
 
 ### Bug Fixes
 
