@@ -250,6 +250,20 @@ TEST_SUITE("PhysicsTests")
 		b2 = bi.CreateBodyWithID(BodyID(0, 2), bc);
 		CHECK(b2 == nullptr);
 
+		// Destroy the first body
+		bi.DestroyBody(b1->GetID());
+
+		// Create a body with a custom ID and a high sequence number
+		b1 = bi.CreateBodyWithID(BodyID(0, 10), bc);
+		CHECK(b1->GetID() == BodyID(0, 10));
+
+		// Destroy it again
+		bi.DestroyBody(b1->GetID());
+
+		// Create another body in the normal way and check that we reuse the body index but that its sequence number got updated
+		b1 = bi.CreateBody(bc);
+		CHECK(b1->GetID() == BodyID(0, 11));
+
 		// Create body with different ID (leave 1 open slot)
 		b2 = bi.CreateBodyWithoutID(bc); // Using syntax that allows separation of allocation and assigning an ID
 		CHECK(b2 != nullptr);
@@ -1810,6 +1824,55 @@ TEST_SUITE("PhysicsTests")
 		CHECK_APPROX_EQUAL(box.GetAngularVelocity(), angular_velocity, 5.0e-3f);
 	}
 
+	// This test checks friction vs speculative contact points. A ball bouncing on the floor will have speculative contact points.
+	// These speculative contact points should not be applied to a point outside the shape.
+	TEST_CASE("TestFrictionVsSpeculativeContactPoint")
+	{
+		PhysicsTestContext c;
+		BodyInterface &bi = c.GetBodyInterface();
+
+		// Create floor
+		Body &floor = c.CreateFloor();
+		floor.SetRestitution(0.8f);
+		floor.SetFriction(0.5f);
+
+		// Create a sphere rolling over the floor
+		const float radius = 0.1f;
+		const float v0 = 2.0f;
+		BodyCreationSettings bcs(new SphereShape(radius), RVec3(0, radius, 1), Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING);
+		bcs.mRestitution = 0.8f;
+		bcs.mFriction = 0.5f;
+		bcs.mLinearVelocity = Vec3(v0, 0, 0);
+		bcs.mLinearDamping = 0.0f;
+		bcs.mAngularDamping = 0.0f;
+		BodyID id1 = bi.CreateAndAddBody(bcs, EActivation::Activate);
+
+		// Create a sphere initially bouncing on the floor and eventually rolling over the floor
+		bcs.mPosition = RVec3(0, 1.35f, -1.0f);
+		BodyID id2 = bi.CreateAndAddBody(bcs, EActivation::Activate);
+
+		c.Simulate(5.0f);
+
+		// Assuming the sphere will eventually roll without slipping so that w1 = v1 / r
+		// and that the impulse at the friction point will lead to this through I * w1 = m * r * (v0 - v1)
+		// with I = 2 / 5 * m * r^2 (inertia of a solid sphere) this leads to
+		// 2 / 5 * m * r^2 * w1 = m * r * (v0 - v1)
+		// 2 / 5 * r * w1 = v0 - v1
+		// 2 / 5 * v1 = v0 - v1
+		// v1 = 5 / 7 * v0
+		float expected_v1 = (5.0f / 7.0f) * v0;
+		float expected_w1 = expected_v1 / radius;
+
+		// Test that both spheres have reached this velocity after some time
+		Vec3 v1, w1, v2, w2;
+		bi.GetLinearAndAngularVelocity(id1, v1, w1);
+		bi.GetLinearAndAngularVelocity(id2, v2, w2);
+		CHECK_APPROX_EQUAL(v1, Vec3(expected_v1, 0, 0), 2.0e-4f * expected_v1); // 0.02% error
+		CHECK_APPROX_EQUAL(w1, Vec3(0, 0, -expected_w1), 2.0e-4f * expected_w1);
+		CHECK_APPROX_EQUAL(v2, Vec3(expected_v1, 0, 0), 2.0e-4f * expected_v1);
+		CHECK_APPROX_EQUAL(w2, Vec3(0, 0, -expected_w1), 2.0e-4f * expected_w1);
+	}
+
 	TEST_CASE("TestAllowedDOFs")
 	{
 		for (uint allowed_dofs = 1; allowed_dofs <= 0b111111; ++allowed_dofs)
@@ -1905,6 +1968,31 @@ TEST_SUITE("PhysicsTests")
 		CHECK_APPROX_EQUAL(body->GetAngularVelocity(), expected_angular_velocity);
 		CHECK(body->GetLinearVelocity() == Vec3::sZero());
 		CHECK(body->GetPosition() == initial_position);
+	}
+
+	TEST_CASE("TestAllowedDOFsVsSmallRotation")
+	{
+		PhysicsTestContext c;
+		Body &floor = c.CreateFloor();
+		floor.SetFriction(1.0f);
+
+		const float cPenetrationSlop = c.GetSystem()->GetPhysicsSettings().mPenetrationSlop;
+		const RVec3 cInitialPos(0, 0.5_r - cPenetrationSlop, 0);
+
+		// Introduce a slight rotation around the X axis (which has been frozen by EAllowedDOFs).
+		// This creates a very tiny (denormalized float) effective mass for the angular friction component.
+		// Inverting this effective mass will make it INF and cause a FP exception if not handled properly.
+		BodyCreationSettings bcs(new BoxShape(Vec3::sReplicate(0.5f)), cInitialPos, Quat(1.0e-20f, 0, 0, 1.0f), EMotionType::Dynamic, Layers::MOVING);
+		bcs.mAllowedDOFs = EAllowedDOFs::Plane2D;
+		bcs.mLinearVelocity = Vec3(0, -1, 0);
+		bcs.mFriction = 1.0f;
+		BodyID id = c.GetBodyInterface().CreateAndAddBody(bcs, EActivation::Activate);
+
+		c.SimulateSingleStep();
+
+		// Check not moved
+		CHECK_APPROX_EQUAL(c.GetBodyInterface().GetPosition(id), cInitialPos, 1.0e-5f);
+		CHECK_APPROX_EQUAL(c.GetBodyInterface().GetLinearVelocity(id), Vec3::sZero(), 1.0e-3f);
 	}
 
 	TEST_CASE("TestSelectiveStateSaveAndRestore")

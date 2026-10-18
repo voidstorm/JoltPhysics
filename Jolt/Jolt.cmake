@@ -830,8 +830,8 @@ else()
 	target_precompile_headers(Jolt PRIVATE "$<$<NOT:$<CONFIG:ReleaseCoverage>>:${JOLT_PHYSICS_ROOT}/Jolt.h>")
 endif()
 
-# Set the NDEBUG define for release builds
-target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Release,Distribution,ReleaseASAN,ReleaseUBSAN,ReleaseTSAN,ReleaseCoverage>:NDEBUG>")
+# Set the JPH_DEBUG define for debug builds
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Debug>:JPH_DEBUG>")
 
 # ASAN and TSAN should use the default allocators
 target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:ReleaseASAN,ReleaseTSAN>:JPH_DISABLE_TEMP_ALLOCATOR;JPH_DISABLE_CUSTOM_ALLOCATOR>")
@@ -864,10 +864,6 @@ endif()
 # Setting to determine number of bits in ObjectLayer
 if (OBJECT_LAYER_BITS)
 	target_compile_definitions(Jolt PUBLIC JPH_OBJECT_LAYER_BITS=${OBJECT_LAYER_BITS})
-endif()
-
-if (USE_STD_VECTOR)
-	target_compile_definitions(Jolt PUBLIC JPH_USE_STD_VECTOR)
 endif()
 
 # Setting to periodically trace broadphase stats to help determine if the broadphase layer configuration is optimal
@@ -990,8 +986,8 @@ else()
 			target_compile_options(Jolt PUBLIC -msimd128 -msse4.2)
 		endif()
 		if (JPH_USE_WASM64)
-			target_compile_options(Jolt PUBLIC -sMEMORY64)
-			target_link_options(Jolt PUBLIC -sMEMORY64)
+			target_compile_options(Jolt PUBLIC -m64)
+			target_link_options(Jolt PUBLIC -m64)
 		endif()
 	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "i386")
 		# x86 and x86_64
